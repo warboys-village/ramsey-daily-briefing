@@ -1,0 +1,32 @@
+---
+pagination:
+  data: ramsey_school_years
+  size: 1
+  alias: yearGroup
+permalink: "/schools-{{ yearGroup.slug }}.ics"
+eleventyExcludeFromCollections: true
+---
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Ramsey Daily Briefing//Ramsey Schools {{ yearGroup.label }} Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Ramsey Schools - {{ yearGroup.label }}
+X-WR-TIMEZONE:Europe/London
+{% for school in ramsey_schools %}
+{% for item in school.keyDates %}
+{% if ("All Years" in item.targetYears) or (yearGroup.code in item.targetYears) or (yearGroup.code == "R" and "R" in item.targetYears) %}
+BEGIN:VEVENT
+UID:school-{{ school.id }}-{{ item.date }}@ramsey-daily
+DTSTAMP:20260817T200000Z
+DTSTART;VALUE=DATE:{{ item.date | replace("-", "") }}
+DTEND;VALUE=DATE:{{ item.date | icsNextDay }}
+SUMMARY:[{{ school.name }}] {{ item.title | escapeIcs }}
+DESCRIPTION:{{ item.details | escapeIcs }}
+LOCATION:{{ school.name | escapeIcs }}
+URL:{{ school.website }}
+END:VEVENT
+{% endif %}
+{% endfor %}
+{% endfor %}
+END:VCALENDAR

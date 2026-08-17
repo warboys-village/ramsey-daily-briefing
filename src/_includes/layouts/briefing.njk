@@ -1,0 +1,35 @@
+---
+layout: layouts/base.njk
+---
+
+{% set currentIso = isoDate or page.fileSlug %}
+{% set formattedDate = currentIso | formatDate %}
+
+<div class="archive-notice-bar">
+  <span>Viewing an archive briefing page</span>
+  <a href="/">Return to today's briefing &rarr;</a>
+</div>
+
+<div class="archive-schools-banner" style="background: var(--color-tag-bg); border: 1px solid var(--color-border); border-radius: var(--border-radius); padding: 0.85rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+  <span style="font-size: 0.95rem; color: var(--color-text-main);">
+    Looking for school news & term dates for <strong>{{ village.villageName }} Schools</strong> for <strong>{{ formattedDate }}</strong>?
+  </span>
+  <a href="/archive/{{ currentIso }}/schools/" class="button-link" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; font-weight: 600; text-decoration: none;">
+    View {{ village.villageName }} Schools Hub &rarr;
+  </a>
+</div>
+
+<article class="briefing-card">
+  <div class="briefing-body">
+    {{ content | safe }}
+  </div>
+</article>
+
+<div class="briefing-footer-bar" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 1rem;">
+  <a href="/archive/{{ currentIso }}/schools/" class="button-link">View {{ village.villageName }} Schools Hub</a>
+  <a href="/archive/{{ currentIso }}/sources/" class="sources-breakdown-link">Sources breakdown</a>
+</div>
+
+<nav class="archive-actions" style="margin-top: 1.5rem;">
+  <a href="/archive/" class="button-link">&larr; Back to Briefing Archive</a>
+</nav>

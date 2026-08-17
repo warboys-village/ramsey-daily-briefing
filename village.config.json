@@ -1,0 +1,78 @@
+{
+  "villageName": "Ramsey",
+  "county": "Cambridgeshire",
+  "districtCouncil": "Huntingdonshire District Council",
+  "parishCouncil": "Ramsey Town Council",
+  "siteTitle": "Ramsey Daily Briefing",
+  "siteUrl": "https://daily.ramsey.town",
+  "siteDescription": "Daily aggregated local news, council meeting minutes, and planning applications for Ramsey, Cambridgeshire.",
+  "timezone": "Europe/London",
+  "outputDir": "src/briefings",
+  "dataDir": "src/_data",
+  "llmConfig": {
+    "model": "gemini-3.5-flash-lite",
+    "maxTurns": 2,
+    "maxTokens": 1500,
+    "preFilterDays": 30,
+    "maxItemSnippetLength": 800
+  },
+  "sources": [
+    {
+      "id": "google-news",
+      "type": "rss",
+      "name": "Google News (Ramsey)",
+      "url": "https://news.google.com/rss/search?q=Ramsey+Cambridgeshire&hl=en-GB&gl=GB&ceid=GB:en",
+      "enabled": true
+    },
+    {
+      "id": "hunts-post",
+      "type": "rss",
+      "name": "The Hunts Post News",
+      "url": "https://www.huntspost.co.uk/news/rss",
+      "filterKeyword": "Ramsey",
+      "enabled": true
+    },
+    {
+      "id": "hdc-planning",
+      "type": "hdc-planning",
+      "name": "Huntingdonshire District Council Planning",
+      "parishFilter": "Ramsey",
+      "enabled": true
+    },
+    {
+      "id": "ramsey-town",
+      "type": "town-council",
+      "name": "Ramsey Town Council",
+      "url": "https://www.ramseytowncouncil.gov.uk/beta-ramsey/documents?query=&sort=latest&tagcategories=Minutes",
+      "enabled": true
+    },
+    {
+      "id": "ramsey-newsletter",
+      "type": "ramsey-council-newsletter",
+      "name": "Ramsey Council Newsletter",
+      "url": "https://www.ramseytowncouncil.gov.uk/town-council-newsletters",
+      "enabled": true
+    },
+    {
+      "id": "library-events",
+      "type": "library-events",
+      "name": "Library Events Calendar",
+      "url": "https://info.cambridgeshire.gov.uk/kb5/cambridgeshire/directory/results.action?camcommunitychannel=6-4&location_postcode__outcode=PE26&sortorder=1&sorttype=field&sortfield=__created",
+      "enabled": true
+    },
+    {
+      "id": "cambs-county",
+      "type": "county-council",
+      "name": "Cambridgeshire County Council",
+      "url": "https://cambridgeshire.cmis.uk.com/ccc_live/",
+      "enabled": true
+    },
+    {
+      "id": "abbey-college",
+      "type": "abbey-college",
+      "name": "Abbey College Weekly Updates",
+      "url": "https://www.abbey.college/weekly-updates",
+      "enabled": true
+    }
+  ]
+}

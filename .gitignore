@@ -12,3 +12,4 @@ _site/
 # OS / Editor files
 .DS_Store
 *.log
+.playwright-mcp/

@@ -1,0 +1,25 @@
+---
+layout: layouts/base.njk
+title: "Ramsey Daily Briefing – Latest Updates"
+permalink: "/index.html"
+---
+
+{% set latestBriefing = collections.briefings[0] %}
+
+{% if latestBriefing %}
+  <article class="briefing-card">
+    <div class="briefing-body">
+      {{ latestBriefing.templateContent | safe }}
+    </div>
+  </article>
+
+  <div class="briefing-footer-bar">
+    <a href="/archive/{{ latestBriefing.data.isoDate }}/sources/" class="sources-breakdown-link">Sources breakdown</a>
+  </div>
+{% else %}
+  <div class="briefing-card">
+    <h2>Welcome to {{ village.villageName }} Daily Briefing</h2>
+    <p>No briefings have been generated yet for {{ village.villageName }}.</p>
+    <p>Run <code>npm run ingest</code> or <code>npm run ingest:mock</code> to trigger data extraction and generate the first briefing.</p>
+  </div>
+{% endif %}

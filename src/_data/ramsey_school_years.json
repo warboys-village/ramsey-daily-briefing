@@ -1,0 +1,11 @@
+[
+  { "code": "R", "label": "Reception / Early Years", "slug": "r" },
+  { "code": "Y1", "label": "Year 1", "slug": "y1" },
+  { "code": "Y2", "label": "Year 2", "slug": "y2" },
+  { "code": "Y3", "label": "Year 3", "slug": "y3" },
+  { "code": "Y4", "label": "Year 4", "slug": "y4" },
+  { "code": "Y5", "label": "Year 5", "slug": "y5" },
+  { "code": "Y6", "label": "Year 6", "slug": "y6" },
+  { "code": "SEC", "label": "Secondary (Years 7–11)", "slug": "sec" },
+  { "code": "6TH", "label": "Sixth Form (Years 12–13)", "slug": "6th" }
+]

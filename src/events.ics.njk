@@ -1,0 +1,24 @@
+---
+permalink: "/events.ics"
+eleventyExcludeFromCollections: true
+---
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//{{ village.villageName }} Daily Briefing//Community Events Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:{{ village.villageName }} Community Events
+X-WR-TIMEZONE:Europe/London
+{% for item in events_calendar %}
+BEGIN:VEVENT
+UID:{{ item.id }}@village-daily
+DTSTAMP:20260815T200000Z
+DTSTART;VALUE=DATE:{{ item.eventDate | replace("-", "") }}
+DTEND;VALUE=DATE:{{ item.eventDate | icsNextDay }}
+SUMMARY:{{ item.title | escapeIcs }}
+DESCRIPTION:{{ item.content | escapeIcs }}
+LOCATION:{{ item.venue | escapeIcs }}
+URL:{{ item.url }}
+END:VEVENT
+{% endfor %}
+END:VCALENDAR

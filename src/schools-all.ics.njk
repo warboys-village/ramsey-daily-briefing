@@ -1,0 +1,26 @@
+---
+permalink: "/schools-all.ics"
+eleventyExcludeFromCollections: true
+---
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Ramsey Daily Briefing//All Ramsey Schools Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Ramsey Schools All Events
+X-WR-TIMEZONE:Europe/London
+{% for school in ramsey_schools %}
+{% for item in school.keyDates %}
+BEGIN:VEVENT
+UID:school-{{ school.id }}-{{ item.date }}@ramsey-daily
+DTSTAMP:20260817T200000Z
+DTSTART;VALUE=DATE:{{ item.date | replace("-", "") }}
+DTEND;VALUE=DATE:{{ item.date | icsNextDay }}
+SUMMARY:[{{ school.name }}] {{ item.title | escapeIcs }}
+DESCRIPTION:{{ item.details | escapeIcs }}
+LOCATION:{{ school.name | escapeIcs }}
+URL:{{ school.website }}
+END:VEVENT
+{% endfor %}
+{% endfor %}
+END:VCALENDAR

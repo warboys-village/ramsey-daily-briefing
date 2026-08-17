@@ -1,0 +1,33 @@
+---
+layout: layouts/base.njk
+title: "Briefing Archive – Ramsey Daily Briefing"
+permalink: "/archive/index.html"
+---
+
+<div style="margin-bottom: 2rem;">
+  <h1 style="font-family: var(--font-serif); font-size: 2rem; margin-bottom: 0.5rem;">Daily Briefing Archive</h1>
+  <p style="color: var(--color-text-muted);">Explore past daily briefings, school hubs, and source details for {{ village.villageName }}, {{ village.county }}.</p>
+</div>
+
+{% if collections.briefings.length > 0 %}
+  <ul class="archive-list">
+    {% for post in collections.briefings %}
+      {% set postIso = post.data.isoDate or post.fileSlug %}
+      <li class="archive-item">
+        <div>
+          <div style="font-size: 0.85rem; color: var(--color-text-muted); font-weight: 600;">{{ post.data.date | formatDate }}</div>
+          <div class="archive-item-title">
+            <a href="/archive/{{ postIso }}/">{{ post.data.title }}</a>
+          </div>
+        </div>
+        <div class="archive-actions">
+          <a href="/archive/{{ postIso }}/" class="button-link">Read Briefing</a>
+          <a href="/archive/{{ postIso }}/schools/" class="button-link">Schools Hub</a>
+          <a href="/archive/{{ postIso }}/sources/" class="button-link">Sources Used</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No archived briefings found.</p>
+{% endif %}

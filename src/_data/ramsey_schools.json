@@ -1,0 +1,103 @@
+[
+  {
+    "id": "abbey-college",
+    "name": "Abbey College, Ramsey",
+    "type": "Secondary & 6th Form (Ages 11–18)",
+    "website": "https://www.abbey.college/",
+    "lettersUrl": "https://www.abbey.college/weekly-updates",
+    "gatehouseUrl": "https://www.ramseygatehouse.co.uk/latest-news",
+    "badgeColor": "#4e3c8a",
+    "description": "Comprehensive secondary school and sixth form (Ramsey Gatehouse Sixth Form) serving Ramsey and surrounding villages.",
+    "keyDates": [
+      {
+        "date": "2026-09-03",
+        "title": "Autumn Term Begins (Year 7 & Year 12 Induction)",
+        "time": "Thursday 3rd September 2026",
+        "targetYears": ["Y7", "Y12"],
+        "details": "First day of academic year for new Year 7 intake and Year 12 students."
+      },
+      {
+        "date": "2026-09-04",
+        "title": "All Students Return (Years 8–11 & Year 13)",
+        "time": "Friday 4th September 2026",
+        "targetYears": ["All Years"],
+        "details": "Full school returns for Autumn Term."
+      },
+      {
+        "date": "2026-10-01",
+        "title": "Year 6 Open Evening (Prospective Intake 2027)",
+        "time": "Thursday 1st October 2026 • 5:30 PM",
+        "targetYears": ["Y6 Parents"],
+        "details": "Open evening for Year 6 pupils and parents across Ramsey primary schools."
+      }
+    ]
+  },
+  {
+    "id": "spinning-infants",
+    "name": "Ramsey Spinning Infant School",
+    "type": "Infant School (EYFS – Year 2)",
+    "website": "https://infants.ramspin.org/",
+    "lettersUrl": "https://infants.ramspin.org/newsletters/",
+    "badgeColor": "#2563eb",
+    "description": "Primary infant school providing early years and Key Stage 1 education.",
+    "keyDates": [
+      {
+        "date": "2026-09-03",
+        "title": "Autumn Term Begins (All Pupils Return)",
+        "time": "Thursday 3rd September 2026",
+        "targetYears": ["R", "Y1", "Y2"],
+        "details": "First day of school year for Reception, Year 1, and Year 2."
+      },
+      {
+        "date": "2026-09-24",
+        "title": "Reception & KS1 Phonics Information Evening for Parents",
+        "time": "Thursday 24th September 2026 • 6:00 PM",
+        "targetYears": ["R", "Y1"],
+        "details": "Interactive parent workshop explaining phonics scheme and home reading strategies."
+      }
+    ]
+  },
+  {
+    "id": "ramsey-juniors",
+    "name": "Ramsey Junior School",
+    "type": "Junior School (Year 3 – Year 6)",
+    "website": "https://juniors.ramspin.org/",
+    "lettersUrl": "https://juniors.ramspin.org/newsletters/",
+    "badgeColor": "#0284c7",
+    "description": "Key Stage 2 junior school preparing pupils for secondary transition.",
+    "keyDates": [
+      {
+        "date": "2026-09-03",
+        "title": "Autumn Term Begins (All Years)",
+        "time": "Thursday 3rd September 2026",
+        "targetYears": ["Y3", "Y4", "Y5", "Y6"],
+        "details": "All junior pupils return to school at 8:45 AM."
+      },
+      {
+        "date": "2026-09-18",
+        "title": "Year 5 & Year 6 Bikeability Cycling Course",
+        "time": "Friday 18th September 2026",
+        "targetYears": ["Y5", "Y6"],
+        "details": "Practical road safety training. Helmet and roadworthy bicycle required."
+      }
+    ]
+  },
+  {
+    "id": "ashbeach-primary",
+    "name": "The Ashbeach Primary School",
+    "type": "Primary School (Ramsey St Mary's)",
+    "website": "https://ashbeach.cambs.sch.uk/",
+    "lettersUrl": "https://ashbeach.cambs.sch.uk/newsletters/",
+    "badgeColor": "#16a34a",
+    "description": "Village primary school serving Ramsey St Mary's and the surrounding rural parish.",
+    "keyDates": [
+      {
+        "date": "2026-09-03",
+        "title": "Autumn Term Begins",
+        "time": "Thursday 3rd September 2026",
+        "targetYears": ["All Years"],
+        "details": "First day of school for all year groups."
+      }
+    ]
+  }
+]

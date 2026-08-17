@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title or village.siteTitle }}</title>
+  <meta name="description" content="{{ description or village.siteDescription }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/css/style.css">
+  <link rel="canonical" href="{{ page.url }}">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="ai-disclosure-banner">
+    <div class="ai-disclosure-content">
+      <span>⚡ This site is aggregated using automation, including generative AI for summaries</span>
+    </div>
+    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Theme mode" title="Theme: Auto (Browser Default)">
+      <span class="theme-icon">Ⓐ</span>
+    </button>
+  </div>
+  <div class="site-container">
+
+    <header class="site-header">
+      <div class="masthead">
+        <div class="masthead-meta">
+          <span class="masthead-location">{{ village.villageName }}, {{ village.county }}</span>
+          <span class="masthead-tagline">The Aggregated Daily Town Briefing</span>
+        </div>
+        <div class="masthead-main">
+          <a href="/" class="site-title">{{ village.villageName }} Daily Briefing</a>
+        </div>
+        <div class="site-subtitle">Daily local news, council governance & community briefing for {{ village.villageName }}, {{ village.county }}</div>
+      </div>
+      <nav class="site-nav">
+        <a href="/">Today</a>
+        <a href="/calendar/">Events Calendar</a>
+        <a href="/schools/">Ramsey Schools</a>
+        <a href="/archive/">Archive</a>
+      </nav>
+
+      {% set latestBriefingItem = collections.briefings[0] %}
+      {% set displayDate = date or (latestBriefing.data.date if latestBriefing else (latestBriefingItem.data.date if latestBriefingItem else null)) %}
+      {% set targetIso = isoDate or (latestBriefing.data.isoDate if latestBriefing else (latestBriefingItem.data.isoDate if latestBriefingItem else null)) %}
+      {% set briefingPermalink = ('/archive/' + targetIso + '/') if targetIso else '/' %}
+      <div class="masthead-date-bar">
+        <a href="{{ briefingPermalink }}" class="masthead-date-link" title="Permalink for {{ displayDate | formatDate if displayDate else 'this briefing' }}">
+          <span class="masthead-date-text">{% if displayDate %}{{ displayDate | formatDate }}{% else %}15 August 2026{% endif %}</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="main-content">
+      {{ content | safe }}
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        &copy; 2026 {{ village.villageName }} Daily. All cited articles, headlines, and content snippets remain the copyright of their respective original publishers and owners.
+      </div>
+    </footer>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (!toggleBtn) return;
+
+      const modes = ['auto', 'light', 'dark'];
+      const icons = { auto: 'Ⓐ', light: '☀', dark: '☾' };
+      const titles = { auto: 'Theme: Auto (Browser Default)', light: 'Theme: Light Mode', dark: 'Theme: Dark Mode' };
+
+      function getCurrentMode() {
+        const saved = localStorage.getItem('theme');
+        return (saved === 'dark' || saved === 'light') ? saved : 'auto';
+      }
+
+      function applyTheme(mode) {
+        if (mode === 'dark' || mode === 'light') {
+          document.documentElement.setAttribute('data-theme', mode);
+          localStorage.setItem('theme', mode);
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.removeItem('theme');
+        }
+
+        const iconEl = toggleBtn.querySelector('.theme-icon');
+        if (iconEl) iconEl.textContent = icons[mode] || 'Ⓐ';
+        toggleBtn.setAttribute('title', titles[mode] || 'Theme mode');
+        toggleBtn.setAttribute('aria-label', titles[mode] || 'Theme mode');
+      }
+
+      let currentMode = getCurrentMode();
+      applyTheme(currentMode);
+
+      toggleBtn.addEventListener('click', function() {
+        const currentIndex = modes.indexOf(currentMode);
+        currentMode = modes[(currentIndex + 1) % modes.length];
+        applyTheme(currentMode);
+      });
+    });
+  </script>
+</body>
+</html>
