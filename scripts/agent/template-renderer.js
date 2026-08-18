@@ -64,7 +64,9 @@ function renderEventCard(item, villageName = 'Ramsey') {
 
 function renderNewsCard(item) {
   const straplineRight = getStraplineRightHtml(item);
-  const itemDateStr = item.date ? new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'Recent';
+  const dateBadgeHtml = item.date
+    ? `<div><span class="badge-status badge-other">${new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span></div>`
+    : ``;
 
   let cleanSummary = (item.content || '').trim();
   const titleText = (item.title || '').trim();
@@ -80,9 +82,7 @@ function renderNewsCard(item) {
   return `<div class="news-card">
   <div class="news-card-header">
     <h5 class="news-title"><a href="${item.url}" target="_blank" rel="noopener">${titleText}</a></h5>
-    <div>
-      <span class="badge-status badge-other">${itemDateStr}</span>
-    </div>
+    ${dateBadgeHtml}
   </div>
   <div class="news-summary">
     <p>${cleanSummary}</p>

@@ -32,6 +32,31 @@ function parseBritishDate(rawStr) {
   return null;
 }
 
+function extractMeetingDate(href, title, desc, publishedDateStr) {
+  const text = `${href} ${title} ${desc}`.toLowerCase();
+
+  // 1. Match YYYYMMDD in filename/title/desc (e.g. 20260625 -> 2026-06-25)
+  const mYmd = text.match(/\b(20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\b/);
+  if (mYmd) {
+    return `${mYmd[1]}-${mYmd[2]}-${mYmd[3]}T12:00:00.000Z`;
+  }
+
+  // 2. Match British date patterns in filename/title/desc (e.g. 25th-june-2026)
+  const parsedFromText = parseBritishDate(text);
+  if (parsedFromText) {
+    return parsedFromText;
+  }
+
+  // 3. Fallback to website publication date
+  if (publishedDateStr) {
+    const parsedPubDate = parseBritishDate(publishedDateStr);
+    if (parsedPubDate) return parsedPubDate;
+  }
+
+  // 4. DO NOT MAKE UP A DATE! Return null if no date can be found.
+  return null;
+}
+
 class TownCouncilSource extends BaseSource {
   constructor(config) {
     super(config);
@@ -70,15 +95,14 @@ class TownCouncilSource extends BaseSource {
 
           const textCombined = `${rawTitle} ${desc} ${href}`.toLowerCase();
 
-          // 1. FILTER: Exclude agendas, financial returns, and non-minutes documents
+          // Exclude agendas, financial returns, and non-minutes documents
           const isAgenda = textCombined.includes('agenda');
           const isMinutes = textCombined.includes('minute') || textCombined.includes('planning') || textCombined.includes('council meeting');
           if (isAgenda && !isMinutes) return;
 
           seenUrls.add(fullUrl);
-          const parsedDate = parseBritishDate(rawDate) || parseBritishDate(rawTitle) || new Date().toISOString();
+          const parsedDate = extractMeetingDate(href, rawTitle, desc, rawDate);
 
-          // 2. DISAGGREGATE: Emit discrete, topic-specific governance cards for meeting minutes
           if (textCombined.includes('planning')) {
             items.push({
               id: `ramsey-town-planning-rec-${i}`,
@@ -130,7 +154,7 @@ class TownCouncilSource extends BaseSource {
           title: `Ramsey Town Council: Great Whyte Pedestrian Safety & Speed Limit Review`,
           content: `From Ramsey Town Council Minutes: Council resolved to submit a formal request to Cambridgeshire County Council Highways for a 20mph speed zone and upgraded zebra crossing along Great Whyte, following resident traffic survey feedback.`,
           url: minutesUrl,
-          date: `2026-07-20T12:00:00.000Z`,
+          date: `2026-06-25T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
           sourceName: this.name
@@ -140,7 +164,7 @@ class TownCouncilSource extends BaseSource {
           title: `Town Council Approves Drainage Repairs & New Play Equipment for Spinningfield`,
           content: `From Ramsey Town Council Amenities Committee: Approved £14,500 contract for drainage improvements across Spinningfield recreation ground, alongside installation of replacement inclusive swing sets in September.`,
           url: minutesUrl,
-          date: `2026-07-20T12:00:00.000Z`,
+          date: `2026-06-25T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
           sourceName: this.name
@@ -150,7 +174,7 @@ class TownCouncilSource extends BaseSource {
           title: `Planning Committee Recommends Refusal for 25 Dwellings Off Oilmills Road`,
           content: `From Ramsey Town Council Planning Committee Minutes: Unanimously recommended refusal for outline application 26/00142/OUT on grounds of highway safety on Oilmills Road, surface water flood risk, and overdevelopment beyond the Ramsey settlement boundary.`,
           url: planningMinutesUrl,
-          date: `2026-08-03T12:00:00.000Z`,
+          date: `2026-07-23T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
           sourceName: this.name
