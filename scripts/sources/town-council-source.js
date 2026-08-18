@@ -95,49 +95,33 @@ class TownCouncilSource extends BaseSource {
 
           const textCombined = `${rawTitle} ${desc} ${href}`.toLowerCase();
 
-          // Exclude agendas, financial returns, and non-minutes documents
-          const isAgenda = textCombined.includes('agenda');
-          const isMinutes = textCombined.includes('minute') || textCombined.includes('planning') || textCombined.includes('council meeting');
-          if (isAgenda && !isMinutes) return;
+          // 1. Strict Exclusions: Exclude policies, standing orders, accounts, and agendas
+          const isPolicyOrAudit = textCombined.includes('policy') || textCombined.includes('standing-order') || textCombined.includes('return') || textCombined.includes('account') || textCombined.includes('audit');
+          const isAgenda = textCombined.includes('agenda') && !textCombined.includes('minute');
+          const isMinutes = textCombined.includes('minute') || (textCombined.includes('planning') && textCombined.includes('meeting'));
+
+          if (isPolicyOrAudit || isAgenda || !isMinutes) return;
 
           seenUrls.add(fullUrl);
+
+          // 2. Explicit Date Parsing (returns null if not found)
           const parsedDate = extractMeetingDate(href, rawTitle, desc, rawDate);
 
-          if (textCombined.includes('planning')) {
-            items.push({
-              id: `ramsey-town-planning-rec-${i}`,
-              title: `Planning Committee Recommends Refusal for 25 Dwellings Off Oilmills Road`,
-              content: `From Ramsey Town Council Planning Minutes: Unanimously recommended refusal for outline application 26/00142/OUT on grounds of highway safety on Oilmills Road, surface water flood risk, and overdevelopment beyond the settlement boundary.`,
-              url: fullUrl,
-              date: parsedDate,
-              category: 'Village News & Governance',
-              sourceId: this.id,
-              sourceName: this.name
-            });
-          } else {
-            items.push(
-              {
-                id: `ramsey-town-great-whyte-${i}`,
-                title: `Ramsey Town Council: Great Whyte Pedestrian Safety & Speed Limit Review`,
-                content: `From Ramsey Town Council Minutes: Council resolved to submit a formal request to Cambridgeshire County Council Highways for a 20mph speed zone and upgraded zebra crossing along Great Whyte, following resident traffic survey feedback.`,
-                url: fullUrl,
-                date: parsedDate,
-                category: 'Village News & Governance',
-                sourceId: this.id,
-                sourceName: this.name
-              },
-              {
-                id: `ramsey-town-spinningfield-${i}`,
-                title: `Town Council Approves Drainage Repairs & New Play Equipment for Spinningfield`,
-                content: `From Ramsey Town Council Amenities Committee: Approved £14,500 contract for drainage improvements across Spinningfield recreation ground, alongside installation of replacement inclusive swing sets in September.`,
-                url: fullUrl,
-                date: parsedDate,
-                category: 'Village News & Governance',
-                sourceId: this.id,
-                sourceName: this.name
-              }
-            );
-          }
+          // 3. Explicit Document Title from Portal
+          const documentTitle = rawTitle || desc || 'Ramsey Town Council Meeting Minutes';
+
+          items.push({
+            id: `ramsey-town-doc-${i}-${Date.now()}`,
+            title: `Ramsey Town Council: ${documentTitle}`,
+            content: desc ? `From Ramsey Town Council: ${desc}` : `Official meeting document published by Ramsey Town Council: ${documentTitle}.`,
+            url: fullUrl,
+            documentUrl: fullUrl,
+            documentTitle: documentTitle,
+            date: parsedDate,
+            category: 'Village News & Governance',
+            sourceId: this.id,
+            sourceName: this.name
+          });
         });
       }
     } catch (err) {
@@ -154,6 +138,8 @@ class TownCouncilSource extends BaseSource {
           title: `Ramsey Town Council: Great Whyte Pedestrian Safety & Speed Limit Review`,
           content: `From Ramsey Town Council Minutes: Council resolved to submit a formal request to Cambridgeshire County Council Highways for a 20mph speed zone and upgraded zebra crossing along Great Whyte, following resident traffic survey feedback.`,
           url: minutesUrl,
+          documentUrl: minutesUrl,
+          documentTitle: `Planning Meeting Minutes 25 June 2026`,
           date: `2026-06-25T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
@@ -164,6 +150,8 @@ class TownCouncilSource extends BaseSource {
           title: `Town Council Approves Drainage Repairs & New Play Equipment for Spinningfield`,
           content: `From Ramsey Town Council Amenities Committee: Approved £14,500 contract for drainage improvements across Spinningfield recreation ground, alongside installation of replacement inclusive swing sets in September.`,
           url: minutesUrl,
+          documentUrl: minutesUrl,
+          documentTitle: `Planning Meeting Minutes 25 June 2026`,
           date: `2026-06-25T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
@@ -174,6 +162,8 @@ class TownCouncilSource extends BaseSource {
           title: `Planning Committee Recommends Refusal for 25 Dwellings Off Oilmills Road`,
           content: `From Ramsey Town Council Planning Committee Minutes: Unanimously recommended refusal for outline application 26/00142/OUT on grounds of highway safety on Oilmills Road, surface water flood risk, and overdevelopment beyond the Ramsey settlement boundary.`,
           url: planningMinutesUrl,
+          documentUrl: planningMinutesUrl,
+          documentTitle: `Planning Meeting Minutes 23 July 2026`,
           date: `2026-07-23T12:00:00.000Z`,
           category: 'Village News & Governance',
           sourceId: this.id,
