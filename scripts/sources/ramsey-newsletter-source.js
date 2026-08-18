@@ -90,8 +90,8 @@ class RamseyNewsletterSource extends BaseSource {
           }
         });
 
-        // Disaggregate newsletter topics into rich, discrete governance cards
-        for (const nl of newslettersFound) {
+        // Disaggregate newsletter topics into rich, discrete governance cards (latest 2 issues)
+        for (const nl of newslettersFound.slice(0, 2)) {
           items.push(
             {
               id: `ramsey-nl-heritage-${Date.now()}-${Math.random()}`,

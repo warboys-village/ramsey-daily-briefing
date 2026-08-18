@@ -113,6 +113,29 @@ describe('Ramsey Daily System - Comprehensive Regression Test Suite', () => {
       assert.ok(!filtered[0].content.startsWith('Share'), 'Content must NOT start with Share');
       assert.ok(filtered[0].content.startsWith('Firefighters'), 'Content must start cleanly with real article text');
     });
+
+    test('excludes internal Abbey College bulletins from main village news', () => {
+      const agent = new BriefingAgent({ villageName: 'Ramsey' });
+      
+      const internalBulletin = {
+        title: "Abbey College: Ramsey Gatehouse Sixth Form February Bulletin8817KB",
+        content: "Internal sixth form notices.",
+        sourceId: "abbey-college",
+        sourceName: "Abbey College Weekly Updates",
+        category: "School News"
+      };
+
+      const communityEvent = {
+        title: "Abbey College Annual Community Science Fete",
+        content: "Open to the whole village community.",
+        sourceId: "abbey-college",
+        sourceName: "Abbey College Weekly Updates",
+        category: "School News"
+      };
+
+      assert.strictEqual(agent.isWholeVillageSchoolItem(internalBulletin), false, 'Internal Abbey College bulletin must be excluded from village news');
+      assert.strictEqual(agent.isWholeVillageSchoolItem(communityEvent), true, 'Community-wide school event must be included');
+    });
   });
 
   describe('4. Deterministic Component Rendering & Categorization (template-renderer.js)', () => {

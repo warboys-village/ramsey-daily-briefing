@@ -1,53 +1,33 @@
 function isDeathNotice(item) {
-  if (!item) return false;
-
-  const rawTitle = (item.title || '').trim();
-  const content = (item.content || '').trim();
-  const rawUrl = (item.url || '').toLowerCase();
-  const combined = `${rawTitle} ${content}`.toLowerCase();
-
-  // Layer 1: URL domain & path pattern check
-  const deathUrlPatterns = [
-    '/announcements/', '/obituaries/', '/in-memoriam/',
-    '/family-notices/', '/notices/death/', 'familynotices.co.uk',
-    'funeral-notices.co.uk', 'bmms.co.uk', 'remembering-'
-  ];
-  if (deathUrlPatterns.some(p => rawUrl.includes(p))) {
-    return true;
-  }
-
-  // Layer 2: Dynamic suffix cleaning (strips any trailing source suffix like "- huntspost.co.uk", "- The Hunts Post", etc.)
-  const cleanTitle = rawTitle
-    .replace(/\s*-\s*[a-z0-9.-]+\.(?:co\.uk|com|org|net|gov\.uk)$/i, '')
-    .replace(/\s*-\s*(?:The Hunts Post|The Hunts Post News|Cambs Times|Google News)$/i, '')
-    .trim();
-
-  // Layer 3: Expanded death notice & obituary keyword/phrase dictionary
+  const title = (item.title || '').trim();
+  const text = `${title} ${item.content || ''}`.toLowerCase();
   const deathKeywords = [
-    'death notice', 'death notices', 'obituary', 'obituaries',
-    'funeral notice', 'funeral notices', 'in memoriam',
-    'passed away', 'beloved wife', 'beloved husband',
-    'beloved mother', 'beloved father', 'beloved son', 'beloved daughter',
-     'beloved sister', 'beloved brother', 'beloved grandmother', 'beloved grandfather',
-    'in loving memory', 'peacefully on', 'crematorium',
-    'funeral service', 'family flowers only', 'donations in lieu',
-    'late of', 'deeply missed', 'sadly passed', 'dearly loved'
+    'death notice',
+    'death notices',
+    'obituary',
+    'obituaries',
+    'in memoriam',
+    'acknowledgements',
+    'passed away peacefully',
+    'sadly passed away',
+    'funeral service',
+    'crematorium service',
+    'family flowers only'
   ];
-  if (deathKeywords.some(kw => combined.includes(kw))) {
-    return true;
+
+  for (const kw of deathKeywords) {
+    if (text.includes(kw)) {
+      return true;
+    }
   }
 
-  // Layer 4: Structural Name + Age Pattern & ALL-CAPS Name Detection
-  // Matches "NAME, Age", "NAME (Age)", "NAME - aged Age"
-  const nameAgePattern = /^[A-Z\s'-]+(?:,\s*\d{1,3}|\s*\(\d{1,3}\)|\s*-\s*aged\s+\d{1,3})/i;
-  if (nameAgePattern.test(cleanTitle)) {
-    return true;
-  }
-
-  const lettersOnly = cleanTitle.replace(/[^A-Za-z]/g, '');
-  if (lettersOnly.length > 5 && lettersOnly === lettersOnly.toUpperCase()) {
-    const isSpecialCaps = cleanTitle.includes('RAMSEY') || cleanTitle.includes('WARBOYS') || cleanTitle.includes('COUNCIL') || cleanTitle.includes('NOTICE') || cleanTitle.includes('PLANNING') || cleanTitle.includes('PARISH') || cleanTitle.includes('TOWN') || cleanTitle.includes('ROAD') || cleanTitle.includes('CLOSURE') || cleanTitle.includes('MEETING') || cleanTitle.includes('POLICE') || cleanTitle.includes('SCHOOL');
-    if (!isSpecialCaps) {
+  // Detect Hunts Post obituary / death notice columns (e.g. ALL CAPS name + "- The Hunts Post")
+  if (text.includes('the hunts post')) {
+    if (text.includes('death') || text.includes('notice') || text.includes('funeral') || text.includes('memoriam')) {
+      return true;
+    }
+    const namePart = title.replace(/\s*-\s*The Hunts Post$/i, '').trim();
+    if (namePart.length >= 4 && namePart === namePart.toUpperCase() && !namePart.includes('COUNCIL') && !namePart.includes('RAMSEY')) {
       return true;
     }
   }
@@ -56,14 +36,16 @@ function isDeathNotice(item) {
 }
 
 function preFilterItems(rawItems, config = {}, nowDate = new Date()) {
-  const { maxDays = 30, maxItemSnippetLength = 800, maxTotalItems = 24 } = config;
+  const { maxDays = 30, maxItemSnippetLength = 800, maxTotalItems = 80 } = config;
 
   const seenTitles = new Set();
   const filtered = [];
 
-  // Separate governance, planning, events (high priority) from generic news
-  const highPriority = [];
-  const genericNews = [];
+  // Group items into distinct categories so general news is guaranteed slots
+  const generalNews = [];
+  const schoolNews = [];
+  const governanceAndPlanning = [];
+  const events = [];
 
   for (const item of rawItems) {
     if (!item || !item.title || !item.url) continue;
@@ -73,24 +55,37 @@ function preFilterItems(rawItems, config = {}, nowDate = new Date()) {
     const srcStr = (item.sourceName || '').toLowerCase();
     const srcIdStr = (item.sourceId || '').toLowerCase();
 
-    const isHighPriority = catStr.includes('governance') || catStr.includes('event') || catStr.includes('plan') || srcStr.includes('parish council') || srcStr.includes('town council') || srcIdStr === 'ramsey-town' || srcIdStr === 'warboys-parish';
-    
-    if (isHighPriority) {
-      highPriority.push(item);
+    const isSchool = srcIdStr.includes('school') || srcIdStr.includes('college') || srcIdStr.includes('abbey-college') || catStr.includes('school') || srcStr.includes('college');
+    const isGovOrPlan = catStr.includes('governance') || catStr.includes('plan') || srcStr.includes('council') || srcIdStr === 'ramsey-town' || srcIdStr === 'cambs-county' || srcIdStr === 'hdc-planning';
+    const isEvent = catStr.includes('event') || srcIdStr.includes('event');
+
+    if (isSchool) {
+      schoolNews.push(item);
+    } else if (isGovOrPlan) {
+      governanceAndPlanning.push(item);
+    } else if (isEvent) {
+      events.push(item);
     } else {
-      genericNews.push(item);
+      generalNews.push(item);
     }
   }
 
   // Sort each group by date descending
-  highPriority.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-  genericNews.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  generalNews.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  governanceAndPlanning.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  events.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  schoolNews.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
-  // Combine with high-priority items first so local governance, planning, and events are never truncated
-  const combinedRaw = [...highPriority, ...genericNews];
+  // Combine with general news & governance first, capping internal school items to 3 max
+  const combinedRaw = [
+    ...generalNews,
+    ...governanceAndPlanning,
+    ...events,
+    ...schoolNews.slice(0, 3)
+  ];
 
   for (const item of combinedRaw) {
-    // Clean title by removing source prefixes/suffixes
+    // Clean title by removing source prefixes/suffixes and filesize noise
     let cleanTitle = item.title.trim()
       .replace(/^FOWL Blog:\s*/i, '')
       .replace(/^Warboys Parish Council:\s*/i, '')
@@ -98,6 +93,7 @@ function preFilterItems(rawItems, config = {}, nowDate = new Date()) {
       .replace(/^Village Scene Magazine:\s*/i, '')
       .replace(/\s*-\s*The Hunts Post$/i, '')
       .replace(/\s*-\s*The Hunts Post News$/i, '')
+      .replace(/\b\d+(?:KB|MB)\b/gi, '')
       .trim();
 
     // Check date cutoff (allow up to 60 days for governance items so latest monthly meeting minutes are preserved)
@@ -118,12 +114,13 @@ function preFilterItems(rawItems, config = {}, nowDate = new Date()) {
 
     seenTitles.add(dedupeKey);
 
-    // Clean text snippet and strip social sharing UI fluff like "Share Share"
+    // Clean text snippet and strip social sharing UI fluff like "Share Share" & file sizes
     let cleanedContent = (item.content || '')
       .replace(/<[^>]*>/g, ' ')
       .replace(/\s+/g, ' ')
       .replace(/^(?:share\s*)+/i, '')
       .replace(/^(?:share\s*(?:facebook|twitter|whatsapp|email)?\s*)+/i, '')
+      .replace(/\b\d+(?:KB|MB)\b/gi, '')
       .trim();
 
     if (cleanedContent.length > maxItemSnippetLength) {
@@ -142,4 +139,4 @@ function preFilterItems(rawItems, config = {}, nowDate = new Date()) {
   return filtered;
 }
 
-module.exports = { preFilterItems };
+module.exports = { preFilterItems, isDeathNotice };

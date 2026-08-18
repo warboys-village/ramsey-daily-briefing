@@ -14,7 +14,8 @@
     "maxTurns": 2,
     "maxTokens": 1500,
     "preFilterDays": 30,
-    "maxItemSnippetLength": 800
+    "maxItemSnippetLength": 800,
+    "maxTotalItems": 80
   },
   "sources": [
     {

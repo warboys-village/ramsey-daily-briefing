@@ -94,8 +94,13 @@ Item #${idx + 1}:
       }
     }
 
-    if (!finalBriefingData) {
-      finalBriefingData = this.groupItemsFallback(items);
+    if (!finalBriefingData || !finalBriefingData.news || finalBriefingData.news.length === 0) {
+      const fallbackData = this.groupItemsFallback(items);
+      if (!finalBriefingData) {
+        finalBriefingData = fallbackData;
+      } else if (fallbackData.news && fallbackData.news.length > 0) {
+        finalBriefingData.news = fallbackData.news;
+      }
     }
 
     return renderFullBriefingHtml(finalBriefingData, villageName, county, this.villageConfig);
@@ -119,24 +124,43 @@ Item #${idx + 1}:
 </div>`;
   }
 
-  isWholeVillageWpaItem(item) {
+  isWholeVillageSchoolItem(item) {
     const srcId = (item.sourceId || '').toLowerCase();
     const srcName = (item.sourceName || '').toLowerCase();
-    const isSchool = srcId.includes('school') || srcName.includes('school') || srcName.includes('academy');
+    const cat = (item.category || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    const content = (item.content || '').toLowerCase();
+    const combinedText = `${title} ${content}`;
+
+    const isSchool = srcId.includes('school') || 
+                     srcId.includes('college') || 
+                     srcId.includes('abbey-college') ||
+                     srcId.includes('wpa') ||
+                     cat.includes('school') ||
+                     srcName.includes('school') || 
+                     srcName.includes('college') || 
+                     srcName.includes('academy');
     
     if (!isSchool) {
       return true;
     }
 
-    if (item.isWholeVillage) return true;
-
-    const combinedText = `${item.title || ''} ${item.content || ''}`.toLowerCase();
-    const wholeVillageKeywords = [
-      'whole village', 'village-wide', 'town-wide', 'community', 'public', 'open to all',
-      'fete', 'fayre', 'fair', 'road safety', 'traffic', 'parking',
-      'crossing patrol', 'floodlit', 'village hall', 'fundraiser for village'
+    // Explicit internal school/college phrases -> EXCLUDE from main village news
+    const internalPhrases = [
+      'whole school', 'family update', 'headteacher', 'bulletin', 'sixth form',
+      'term date', 'newsletter', 'weekly update', 'student', 'pupil', 'assembly',
+      'parent forum', 'governor', 'open evening', 'curriculum', 'donated', 'programme'
     ];
-    return wholeVillageKeywords.some(kw => combinedText.includes(kw));
+    if (internalPhrases.some(p => combinedText.includes(p))) {
+      return false;
+    }
+
+    // Specific external community event keywords -> INCLUDE in main village news
+    const externalKeywords = [
+      'fete', 'fayre', 'fair', 'car boot sale', 'road safety', 'traffic crossing',
+      'open to all', 'open to the whole village', 'village hall fundraiser'
+    ];
+    return externalKeywords.some(kw => combinedText.includes(kw));
   }
 
   groupItemsFallback(items) {
@@ -160,7 +184,7 @@ Item #${idx + 1}:
     ));
     const generalNewsItems = items.filter(i => {
       if (eventItems.includes(i) || planningItems.includes(i) || governanceItems.includes(i)) return false;
-      return this.isWholeVillageWpaItem(i);
+      return this.isWholeVillageSchoolItem(i);
     });
 
     return {
