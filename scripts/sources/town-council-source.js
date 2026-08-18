@@ -95,20 +95,17 @@ class TownCouncilSource extends BaseSource {
 
           const textCombined = `${rawTitle} ${desc} ${href}`.toLowerCase();
 
-          // 1. Strict Exclusions: Exclude policies, standing orders, accounts, and standalone agendas
-          const isPolicyOrAudit = textCombined.includes('policy') || textCombined.includes('standing-order') || textCombined.includes('return') || textCombined.includes('account') || textCombined.includes('audit');
-          const isAgenda = textCombined.includes('agenda') && !textCombined.includes('minute');
-          const isMinutes = textCombined.includes('minute') || (textCombined.includes('planning') && textCombined.includes('meeting'));
-
-          if (isPolicyOrAudit || isAgenda || !isMinutes) return;
+          // Exclude non-meeting policy documents (standing orders, privacy notice, financial regs, audit returns)
+          const isPolicyOrAudit = textCombined.includes('policy') || textCombined.includes('standing-order') || textCombined.includes('annual-return') || textCombined.includes('account') || textCombined.includes('audit');
+          if (isPolicyOrAudit) return;
 
           seenUrls.add(fullUrl);
 
-          // 2. Explicit Date Parsing (returns null if not found)
+          // Extract exact meeting date (returns null if not found)
           const parsedDate = extractMeetingDate(href, rawTitle, desc, rawDate);
-          const documentTitle = rawTitle || desc || 'Ramsey Town Council Meeting Minutes';
+          const documentTitle = rawTitle || desc || 'Ramsey Town Council Meeting Document';
 
-          // 3. DISAGGREGATE: Emit discrete, topic-specific governance cards for every meeting minutes document
+          // Disaggregate meeting documents into topic-specific governance news items
           if (textCombined.includes('planning')) {
             items.push(
               {
