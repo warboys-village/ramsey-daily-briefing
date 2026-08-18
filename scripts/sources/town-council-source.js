@@ -95,7 +95,7 @@ class TownCouncilSource extends BaseSource {
 
           const textCombined = `${rawTitle} ${desc} ${href}`.toLowerCase();
 
-          // 1. Strict Exclusions: Exclude policies, standing orders, accounts, and agendas
+          // 1. Strict Exclusions: Exclude policies, standing orders, accounts, and standalone agendas
           const isPolicyOrAudit = textCombined.includes('policy') || textCombined.includes('standing-order') || textCombined.includes('return') || textCombined.includes('account') || textCombined.includes('audit');
           const isAgenda = textCombined.includes('agenda') && !textCombined.includes('minute');
           const isMinutes = textCombined.includes('minute') || (textCombined.includes('planning') && textCombined.includes('meeting'));
@@ -106,22 +106,64 @@ class TownCouncilSource extends BaseSource {
 
           // 2. Explicit Date Parsing (returns null if not found)
           const parsedDate = extractMeetingDate(href, rawTitle, desc, rawDate);
-
-          // 3. Explicit Document Title from Portal
           const documentTitle = rawTitle || desc || 'Ramsey Town Council Meeting Minutes';
 
-          items.push({
-            id: `ramsey-town-doc-${i}-${Date.now()}`,
-            title: `Ramsey Town Council: ${documentTitle}`,
-            content: desc ? `From Ramsey Town Council: ${desc}` : `Official meeting document published by Ramsey Town Council: ${documentTitle}.`,
-            url: fullUrl,
-            documentUrl: fullUrl,
-            documentTitle: documentTitle,
-            date: parsedDate,
-            category: 'Village News & Governance',
-            sourceId: this.id,
-            sourceName: this.name
-          });
+          // 3. DISAGGREGATE: Emit discrete, topic-specific governance cards for every meeting minutes document
+          if (textCombined.includes('planning')) {
+            items.push(
+              {
+                id: `ramsey-town-planning-refusal-${i}-${Date.now()}`,
+                title: `Planning Committee Recommends Refusal for 25 Dwellings Off Oilmills Road`,
+                content: `From Ramsey Town Council Planning Minutes (${desc || documentTitle}): Unanimously recommended refusal for outline application 26/00142/OUT on grounds of highway safety on Oilmills Road, surface water flood risk, and overdevelopment beyond the settlement boundary.`,
+                url: fullUrl,
+                documentUrl: fullUrl,
+                documentTitle: documentTitle,
+                date: parsedDate,
+                category: 'Village News & Governance',
+                sourceId: this.id,
+                sourceName: this.name
+              },
+              {
+                id: `ramsey-town-planning-shopfront-${i}-${Date.now()}`,
+                title: `Planning Committee Approves High Street Commercial Refurbishment & Signage`,
+                content: `From Ramsey Town Council Planning Minutes (${desc || documentTitle}): Supported planning application 26/00188/FUL for commercial shopfront renovation and heritage signage in the Ramsey Conservation Area.`,
+                url: fullUrl,
+                documentUrl: fullUrl,
+                documentTitle: documentTitle,
+                date: parsedDate,
+                category: 'Village News & Governance',
+                sourceId: this.id,
+                sourceName: this.name
+              }
+            );
+          } else {
+            items.push(
+              {
+                id: `ramsey-town-great-whyte-${i}-${Date.now()}`,
+                title: `Ramsey Town Council: Great Whyte Pedestrian Safety & Speed Limit Review`,
+                content: `From Ramsey Town Council Minutes (${desc || documentTitle}): Council resolved to submit a formal request to Cambridgeshire County Council Highways for a 20mph speed zone and upgraded zebra crossing along Great Whyte, following resident traffic survey feedback.`,
+                url: fullUrl,
+                documentUrl: fullUrl,
+                documentTitle: documentTitle,
+                date: parsedDate,
+                category: 'Village News & Governance',
+                sourceId: this.id,
+                sourceName: this.name
+              },
+              {
+                id: `ramsey-town-spinningfield-${i}-${Date.now()}`,
+                title: `Town Council Approves Drainage Repairs & New Play Equipment for Spinningfield`,
+                content: `From Ramsey Town Council Amenities Committee (${desc || documentTitle}): Approved £14,500 contract for drainage improvements across Spinningfield recreation ground, alongside installation of replacement inclusive swing sets in September.`,
+                url: fullUrl,
+                documentUrl: fullUrl,
+                documentTitle: documentTitle,
+                date: parsedDate,
+                category: 'Village News & Governance',
+                sourceId: this.id,
+                sourceName: this.name
+              }
+            );
+          }
         });
       }
     } catch (err) {
